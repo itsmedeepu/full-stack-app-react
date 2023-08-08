@@ -7,7 +7,7 @@ import Dashboard from "./components/Dashboard";
 import Error from "./components/errorpages/Error";
 function App() {
   return (
-    <BrowserRouter basename="/full-stack-app-react">
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/register" element={<Register />}></Route>

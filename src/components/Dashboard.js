@@ -3,6 +3,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import {
+  MDBCard,
+  MDBCardBody,
+  MDBCardTitle,
+  MDBCardText,
+  MDBCardHeader,
+  MDBTabs,
+  MDBTabsItem,
+  MDBTabsLink,
+  MDBBtn,
+  MDBSpinner,
+} from "mdb-react-ui-kit";
+
 const Dashboard = () => {
   const [users, setUser] = useState({
     userid: "",
@@ -10,9 +23,17 @@ const Dashboard = () => {
     email: "",
     phone: "",
   });
+  // const [Order, setOrders] = useEffect({
+  //   tableno: "",
+  //   orderid: "",
+  //   dishes: [],
+  // });
+
+  const [pageloading, SetPageLoading] = useState(false);
   const baseUrl = "http://localhost:5000/admin/";
   const navigate = useNavigate();
   useEffect(() => {
+    SetPageLoading(true);
     const token = localStorage.getItem("auth-token");
     const checkLogin = localStorage.getItem("isloggedin");
 
@@ -28,14 +49,14 @@ const Dashboard = () => {
         .get(baseUrl + "dashboard", config)
         .then((data) => {
           const user = data.data.data;
-
           setUser(user);
-          console.log({ ...users, ...user });
         })
         .catch((err) => {
           navigate("/error");
         });
     }
+
+    SetPageLoading(false);
   }, []);
 
   const handleClick = () => {
@@ -46,35 +67,39 @@ const Dashboard = () => {
   };
   return (
     <>
-      <div className="card">
-        <table>
-          <tr>
-            <td>
-              <p>Name :</p>
-            </td>
-            <td>
-              <p>{users.name}</p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p>Email :</p>
-            </td>
-            <td>
-              <p>{users.email}</p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p>Phone :</p>
-            </td>
-            <td>
-              <p>{users.phone}</p>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <button onClick={handleClick}>Logout </button>
+      <MDBCard className="text-center">
+        <MDBCardHeader>
+          <MDBTabs className="card-header-tabs">
+            <MDBTabsItem>
+              <MDBTabsLink active>Active</MDBTabsLink>
+            </MDBTabsItem>
+            <MDBTabsItem>
+              <MDBTabsLink>Link</MDBTabsLink>
+            </MDBTabsItem>
+            <MDBTabsItem>
+              <MDBTabsLink className="disabled">Disabled</MDBTabsLink>
+            </MDBTabsItem>
+          </MDBTabs>
+        </MDBCardHeader>
+        <MDBCardBody>
+          {users.name === "" ? ( // Check if pageloading is true
+            <MDBSpinner
+              className="me-2"
+              style={{ width: "3rem", height: "3rem" }}
+            >
+              <span className="visually-hidden">Loading...</span>
+            </MDBSpinner>
+          ) : (
+            <div>
+              <MDBCardTitle>Welcome to Dashboard {users.name}</MDBCardTitle>
+              {/* ...other card content... */}
+              <MDBBtn onClick={handleClick} className="">
+                Logout
+              </MDBBtn>
+            </div>
+          )}
+        </MDBCardBody>
+      </MDBCard>
     </>
   );
 };

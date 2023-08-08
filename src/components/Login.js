@@ -104,7 +104,7 @@ const Login = () => {
         onLoaderFinished={() => setProgress(0)}
         ref={loadingBarRef}
       />
-      <form className="col-lg-2 col-md-6 m-auto mt-5 ">
+      <form className="col-lg-2 col-sm-2 col-md-2 m-auto mt-5 ">
         <MDBCardHeader>
           <h2 className="text-center">Login Here</h2>
         </MDBCardHeader>

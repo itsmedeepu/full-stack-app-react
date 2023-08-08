@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 
 const Register = () => {
-  const baseUrl = "https://bored-elk-helmet.cyclic.app/admin/";
+  const baseUrl = "http://localhost:5000/admin/";
   const [admin, setAdmin] = useState({
     name: "",
     email: "",
