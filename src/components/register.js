@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 
 const Register = () => {
-  const baseUrl = "http://localhost:5000/admin/";
+  const baseUrl = "https://bored-elk-helmet.cyclic.app/admin/";
   const [admin, setAdmin] = useState({
     name: "",
     email: "",
@@ -26,8 +26,6 @@ const Register = () => {
     }
 
     setAdmin({ ...admin, [name]: value });
-
-
   };
 
   const handleSubmit = (event) => {
