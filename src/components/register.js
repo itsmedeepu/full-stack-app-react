@@ -1,8 +1,11 @@
-import { useState } from "react";
-
+import { useState, useRef } from "react";
 import axios from "axios";
-
+import { MDBInput, MDBBtn, MDBCardHeader, MDBSpinner } from "mdb-react-ui-kit";
+import { ToastContainer, toast } from "react-toastify";
+import LoadingBar from "react-top-loading-bar";
 const Register = () => {
+  const loadingBarRef = useRef(null);
+  const [progress, setProgress] = useState(0);
   const baseUrl = "http://localhost:5000/admin/";
   const [admin, setAdmin] = useState({
     name: "",
@@ -12,114 +15,195 @@ const Register = () => {
     cpassword: "",
   });
 
-  const [errormsg, setErrormsg] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const HandleChange = (event) => {
     const { name, value } = event.target;
 
     if (name === "cpassword") {
       if (admin.password !== value) {
-        setErrormsg(false);
       } else {
-        setErrormsg(true);
       }
     }
 
     setAdmin({ ...admin, [name]: value });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const checkAllDetails = () => {
+    if (
+      admin.name == "" ||
+      admin.email == "" ||
+      admin.password == "" ||
+      admin.phone == "" ||
+      admin.cpassword == ""
+    ) {
+      toast.warn("Dont leave blank", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
 
+      return 1;
+    }
+  };
+
+  const handleSubmit = (event) => {
+    if (checkAllDetails() == 1) {
+      return;
+    }
+    event.preventDefault();
+    setLoading(true);
+    loadingBarRef.current.continuousStart();
+    setProgress(10);
+    setLoading(true);
     const check = admin.password === admin.cpassword ? true : false;
     if (check) {
       axios
-        .post(baseUrl + "register", admin)
+        .post(baseUrl + "register", admin, {
+          onUploadProgress: (progressEvent) => {
+            const progressPercent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setProgress(progressPercent);
+          },
+        })
         .then((data) => {
-          console.log(data.data.message);
+          toast.success("user registred sucessfully", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          setAdmin({
+            name: "",
+            email: "",
+            password: "",
+            phone: "",
+            cpassword: "",
+          });
         })
         .catch(function (error) {
-          console.log(error);
+          toast.error("something went bad at servser side ", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+          loadingBarRef.current.complete();
         });
     } else {
-      window.alert("confirm password not matching");
+      loadingBarRef.current.complete();
+      toast.warn("Confirm password not matching", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
+    setLoading(false);
   };
   return (
     <>
-      <table>
-        <tr>
-          <td>Name</td>
-          <td>
-            <input
-              type="text"
-              onChange={HandleChange}
-              name="name"
-              id="name"
-              value={admin.name}
-              required
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>
-            <input
-              type="email"
-              onChange={HandleChange}
-              name="email"
-              id="email"
-              value={admin.email}
-              required
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>Phone</td>
-          <td>
-            <input
-              type="phone"
-              onChange={HandleChange}
-              name="phone"
-              id="phone"
-              value={admin.phone}
-              required
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>Password</td>
-          <td>
-            <input
-              type="password"
-              onChange={HandleChange}
-              name="password"
-              value={admin.password}
-              id="password"
-              required
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>confirm Password</td>
-          <td>
-            <input
-              type="password"
-              onChange={HandleChange}
-              name="cpassword"
-              value={admin.cpassword}
-              id="cpassword"
-              required
-            />
-            {errormsg ? <span></span> : <span>Password not matching</span>}
-          </td>
-        </tr>
-        <tr>
-          <button onClick={handleSubmit} type="button">
+      <LoadingBar
+        color="#f11946"
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+        ref={loadingBarRef}
+      />
+      <form className="col-lg-2 col-sm-2 col-md-2 m-auto mt-5 ">
+        <MDBCardHeader>
+          <h2 className="text-center">Register Here</h2>
+        </MDBCardHeader>
+        <MDBInput
+          className="mb-4"
+          type="email"
+          id="form1Example1"
+          label="Name"
+          name="name"
+          onChange={HandleChange}
+          value={admin.name}
+        />
+        <MDBInput
+          className="mb-4"
+          type="text"
+          id="form1Example2"
+          label="Email"
+          name="email"
+          onChange={HandleChange}
+          value={admin.email}
+        />
+        <MDBInput
+          className="mb-4"
+          type="text"
+          id="form1Example2"
+          label="Phone"
+          name="phone"
+          onChange={HandleChange}
+          value={admin.phone}
+        />
+        <MDBInput
+          className="mb-4"
+          type="password"
+          id="form1Example2"
+          label="Create Password"
+          name="password"
+          onChange={HandleChange}
+          value={admin.password}
+        />
+        <MDBInput
+          className="mb-4"
+          type="password"
+          id="form1Example2"
+          label="Confrim Password"
+          name="cpassword"
+          onChange={HandleChange}
+          value={admin.cpassword}
+        />
+
+        {loading ? (
+          <MDBBtn disabled block>
+            <MDBSpinner size="sm" role="status" tag="span" className="me-2" />
+            Wait...
+          </MDBBtn>
+        ) : (
+          <MDBBtn type="button" onClick={handleSubmit} block>
             Register
-          </button>
-        </tr>
-      </table>
+          </MDBBtn>
+        )}
+      </form>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 };

@@ -1,6 +1,5 @@
 {
   "name": "rest-frontend",
-  "homepage": "https://itsmedeepu.github.io/full-stack-app-react",
   "version": "0.1.0",
   "private": false,
   "dependencies": {
